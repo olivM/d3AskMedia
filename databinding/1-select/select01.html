@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+
+	<script type="text/javascript" src="../../src/d3.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+
+<div id='titre'> </div>
+<div id='journal'></div>
+<div id='journal'></div>
+<div id='journal'></div>
+
+<table id="journaux" border="0">
+  <tr id="titre">
+  </tr>
+  <tr class="journal">
+  </tr>
+  <tr class="journal">
+  </tr>
+  <tr class="journal">
+  </tr>
+</table>
+
+
+<script type="text/javascript">
+
+// Question 1 - Ajouter un élément p contenant "Les journaux français" à la balise div id=titre
+
+d3.select("#titre").append("p").text("Les journaux français")
+
+// Question 2 - Ajouter un élément p contenant "Le Monde" à chacune des balises div class=journal
+
+d3.selectAll(".journal").append("p").text("Le Monde")
+
+</script>
+
+</body>

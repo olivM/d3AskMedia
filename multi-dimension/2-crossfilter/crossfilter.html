@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+
+	<script type="text/javascript" src="../../src/d3.js"></script>
+  <script type="text/javascript" src="https://rawgithub.com/NickQiZhu/dc.js/master/web/js/crossfilter.js"></script>
+
+<style>
+
+
+</style>
+
+</head>
+
+<body>
+  
+<script type="text/javascript">
+
+  var media;
+
+d3.csv("../sets/sitesmedia.csv",function(data) {
+  
+// créer une instance crossfilter
+  
+media = crossfilter(data);
+
+
+// 1 - Combien y a t il de lignes dans mon set de données ? 
+
+var totalCount = media.groupAll().reduceCount().value();
+
+console.log("total count : " + totalCount);
+
+// 2 - Quel est le total de pages vues ? 
+
+var totalPV = media.groupAll().reduceSum(function(d) {return parseFloat(d.pagevues);}).value();
+
+console.log("total de pages vues :" + totalPV);
+
+// 3 - Combien y a t il de journaux de réseau site internet ? 
+
+var reseau = media.dimension(function(d) {return d.reseau;});
+
+reseau.filter("Site Internet");
+
+var siteInternetCount = media.groupAll().reduceCount().value();
+
+console.log("total de Site Internet :" + siteInternetCount);  
+
+// 4 - Reset les filtres appliqués ? 
+
+reseau.filterAll();
+
+//5 - Grouper par réseau 
+
+var groupReseauCount = reseau.group().reduceCount().all();
+
+console.log(groupReseauCount);
+
+// 6 - Grouper et sommer les visites par types de journaux
+
+var theme = media.dimension(function(d) {return d.theme;});
+
+var groupThemeVisite = theme.group().reduceSum(function(d) {return d.visites;}).all();
+
+console.log(groupThemeVisite);
+
+// 7 - Afficher tous les éléments sous forme de Tableau
+
+var all = theme.top(Infinity);
+
+console.log(all);
+
+});
+
+
+	</script>
+
+</body>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+
+	<script type="text/javascript" src="../../src/d3.js"></script>
+  <script type="text/javascript" src="../sets/groupepresse.js"></script>
+
+    <style>
+
+	.node circle {
+	  fill: #fff;
+	  stroke: steelblue;
+	  stroke-width: 1px;
+	}
+
+	.node text { font: 12px sans-serif; }
+
+	.link {
+	  fill: none;
+	  stroke: #ccc;
+	  stroke-width: 2px;
+	}
+	
+    </style>
+
+<style>
+
+
+</style>
+
+</head>
+
+<body>
+  
+  <h1> Les Groupes de presse français</h1>
+  
+  <p id="chart">
+
+
+	<script type="text/javascript">
+
+    var margin = {top: 20, right: 120, bottom: 20, left: 120},
+    	width = 960 - margin.right - margin.left,
+    	height = 900 - margin.top - margin.bottom;
+	
+    var i = 0;
+
+    // Méthode qui prépare le set de données pour le format à visualiser
+
+    var tree = d3.layout.tree()
+    	.size([height, width]);
+
+    // SVG Shape generator qui permet de tracer un lien à partir de l'objet {source, target} 
+
+    var diagonal = d3.svg.diagonal()
+    	.projection(function(d) { return [d.y, d.x]; });
+  
+    var svg = d3.select("#chart").append("svg")
+    	.attr("width", width + margin.right + margin.left)
+    	.attr("height", height + margin.top + margin.bottom)
+      .append("g")
+    	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    root = groupes[0];
+  
+    update(root);
+
+    function update(source) {
+
+      var nodes = tree.nodes(root), // Calculer les positions des noeuds
+    	  links = tree.links(nodes); // Calculer les positions des branches de l'arbre
+
+      // Sélection et data binding des noeuds
+      var node = svg.selectAll("g.node")
+    	  .data(nodes);
+
+      // Enter et ajout des noeuds
+      var nodeEnter = node.enter().append("g")
+    	  .attr("class", "node")
+    	  .attr("transform", function(d) { 
+    		  return "translate(" + d.y + "," + d.x + ")"; });
+
+      nodeEnter.append("circle")
+    	  .attr("r", 3)
+    	  .style("fill", "#fff");
+
+      nodeEnter.append("text")
+    	  .attr("x", function(d) {
+    		  return d.children || d._children ? -13 : 13; }) // Trick intéressant. Permet de positionner à droite ou à gauche en fonction de si un élément dispose ou non d'éléments children
+    	  .attr("dy", ".35em")
+    	  .attr("text-anchor", function(d) { 
+    		  return d.children || d._children ? "end" : "start"; })
+    	  .text(function(d) { return d.name; })
+    	  .style("fill-opacity", 1);
+
+      // Sélection et data binding des liens
+      var link = svg.selectAll("path.link")
+    	  .data(links);
+
+      // Append des liens
+      link.enter().insert("path", "g")
+    	  .attr("class", "link")
+    	  .attr("d", diagonal );
+
+    }
+
+
+	</script>
+
+</body>

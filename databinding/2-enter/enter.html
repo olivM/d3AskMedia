@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+
+	<script type="text/javascript" src="../../src/d3.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+
+<div> Les journaux français </div>
+
+<script type="text/javascript">
+
+// Question 1 : écrire le pattern pour créer 3 éléments à partir du tableau suivant : 
+
+var journaux = ["Le Monde","Le Nouvel Obs","Libération"];
+
+// Réponse
+
+d3.select("body").selectAll("p")
+  .data(journaux)
+.enter().append("p")
+.text(String);
+
+
+</script>
+
+</body>
+

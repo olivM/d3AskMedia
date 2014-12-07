@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+
+	<script type="text/javascript" src="../../src/d3.js"></script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+
+<div> Les journaux français </div>
+
+<script type="text/javascript">
+
+var journaux1 = ["Le Monde","Le Nouvel Obs","Libération"];
+var journaux2 = ["Le Monde"];
+
+d3.select("body").selectAll("p")
+  .data(journaux1)
+.enter().append("p")
+.text(String);
+
+// Question : écrire le pattern permettant d'actualiser la vue en passant du tableau journaux1 au tableau journaux2
+
+// Réponse
+
+//1 - Update
+
+d3.select("body").selectAll("p")
+  .data(journaux2)
+.text(String)
+
+//2 - Exit elements
+
+d3.select("body").selectAll("p")
+  .data(journaux2)
+.exit().remove();  
+
+
+</script>
+
+</body>
+
