@@ -17,27 +17,110 @@
   
 <script type="text/javascript">
 
-  var media;
+  var media,
+	  data,
+  	  reseau;
 
-d3.csv("../sets/sitesmedia.csv",function(data) {
-  
-// créer une instance crossfilter
-  
-media = crossfilter(data);
+d3.csv("../sets/sitesmedia.csv",function(source) {
+	  
+	data = source;
 
-// 1 - Combien y a t il de lignes dans mon set de données ? 
+	// créer une instance crossfilter
+	  
+	media = crossfilter(data);
 
-// 2 - Quel est le total de pages vues ? 
+	// 1 - Combien y a t il de lignes dans mon set de données ? 
+	console.log(media.size());
 
-// 3 - Combien y a t il de journaux de réseau site internet ? 
+	// 2 - Quel est le total de pages vues ? 
 
-// 4 - Reset les filtres appliqués ? 
+	var pagesVues = media.groupAll().reduceSum(function(d) { return parseFloat(d.pagevues); }).value();
 
-//5 - Grouper par réseau 
+	console.log(pagesVues);
 
-// 6 - Grouper et sommer les visites par types de journaux
 
-// 7 - Afficher tous les éléments sous forme de Tableau
+	// 3 - Combien y a t il de journaux de réseau site internet ? 
+
+	reseau = media.dimension(function(d) { return d.reseau; });
+
+	reseau.filter("Site Internet");
+
+	console.log(media.groupAll().reduceCount().value());
+
+
+
+	// 4 - Reset les filtres appliqués ? 
+
+	reseau.filterAll();
+
+	console.log(media.groupAll().reduceCount().value());
+
+
+	//5 - Grouper par réseau 
+
+	console.log( reseau.group().reduceCount().all() );
+	console.log( reseau.group().reduceCount().top(1) );
+
+
+	// 6 - Grouper et sommer les visites par types de journaux
+
+	var theme = media.dimension(function(d){ 
+		return d.theme;
+	});
+
+	console.log(
+		theme.group().reduceSum(function(d) {
+			return parseFloat(d.visites);
+		}).top(Infinity)
+	);
+
+	// 6 bis - afficher les sites du premier quartile en nb de visites
+
+	// reseau.filter("Site Internet");
+
+	var i = 0;
+	var range = d3.nest()
+		.key(function(d) { 
+			return i++; 
+		})
+		.rollup(function(d){
+			return parseFloat(d[0].visites);
+		})
+		.entries(data)
+		.sort(function(a, b){
+			return a.values - b.values;
+		})
+		.map(function(d) {
+			return d.values;
+		});
+
+
+	var quartile = d3.quantile(range, 0.25);
+
+	console.log("quartile", quartile);
+
+	visites = media.dimension(function(d) { return parseFloat(d.visites); });
+
+	visites.filterRange([0, quartile]);
+
+	theme.filter("Actu / Informations");
+
+	console.log( 
+		visites.top(Infinity)
+	);
+	console.log( 
+		theme.top(Infinity)
+	);
+
+
+	var pagesVues = media.groupAll().reduceSum(function(d) { return parseFloat(d.pagevues); }).value();
+
+	console.log(pagesVues);
+
+
+	
+
+	// 7 - Afficher tous les éléments sous forme de Tableau
 
 });
 

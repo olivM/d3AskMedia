@@ -37,11 +37,11 @@ var margin = {top: 20, right: 40, bottom: 10, left: 40},
     width = 960,
     height = 500 - margin.top - margin.bottom;
 
-var charData,
-    chartDataAll,
+var chartData,
     theme,
-    type,
-    titres;
+    themes,
+    audience,
+    extent;
 
 var svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -57,23 +57,93 @@ d3.select("#resetAll")
 .on("click",updatedata);
 
 d3.select("#theme select")
-.on("change",function() {updatedata("theme",d3.select(this).property("value"))});
+.on("change",function() {updatedata("theme", d3.select(this).property("value"))});
 
 d3.select("#audience button")
-.on("click", function() {updatedata("audience",[parseFloat(d3.select("#min").property("value")),parseFloat(d3.select("#max").property("value"))] )});
+.on("click", function() {updatedata("audience", [parseFloat(d3.select("#min").property("value")),parseFloat(d3.select("#max").property("value"))] )});
 
 d3.csv("../sets/sitesmedia.csv",function(csv) {
   
   // Créer la visusalisation 
+
+  themes = Object.keys(d3.nest()
+    .key(function(d){
+      return d.theme;
+    })
+    .map(csv));
+
+  themes.unshift('-');
+
+  x.domain(themes);
+
+  console.log(themes);
+
+  d3.select('#theme select')
+    .selectAll('option')
+    .data(themes).enter().append('option').text(function(d){
+    return d;
+  });
+
+  extent = d3.extent(csv, function(d) { return parseFloat(d.visites); });
+
+  y.domain(extent);
+
+  media = crossfilter(csv);
+
+  theme = media.dimension(function(d) { return d.theme; });
+  audience = media.dimension(function(d) { return parseFloat(d.visites); });
   
+  // data = media.groupAll().reduceSum(function(d) { return d; });
+
+  updatedata();
+
 });
 
 function updatedata(value, selection) {
-    
+    console.log("updateData", value, selection);
+  
+    switch(value) {
+      case 'theme':
+        if ( selection === '-' )
+          theme.filterAll();
+        else
+          theme.filter(selection);
+      break;
+      case 'audience':
+        console.log(selection);
+        if ( ! selection[0]  )
+          selection[0] = extent[0];
+        if ( ! selection[1]  )
+          selection[1] = extent[1];
+        console.log(selection);
+        audience.filterRange(selection);
+      break;
+      default:
+        audience.filterAll();
+        theme.filterAll();
+      break;
+    };
+
+    chartData = audience.top(Infinity);
+
+    drawScatter();
 }
 
 function drawScatter() {
 
+  var bind = svg.selectAll('circle').data(chartData, function(d) { return d.nom; });
+
+  var bindEnter = bind.enter()
+    .append('circle')
+    .attr('r', 5)
+    .attr('fill', function(d) { return color(d.theme); })
+    .attr('cx', function(d) { return x(d.theme); })
+    .attr('cy', function(d) { return y(d.visites); })
+  ;
+
+  var bindExit = bind.exit()
+    .remove()
+  ;
 
 }
 
