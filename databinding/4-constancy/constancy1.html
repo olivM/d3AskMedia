@@ -60,14 +60,47 @@ var svg = d3.select("body").append("svg:svg")
 
 function update(a) {
 
-var dataUpdate = data[a];
+  var dataUpdate = data[a];
 
-// Question 1 - Ecrire le d3 pattern permettant d'actualiser les éléments à chaque appel de la fonction update. Les nouveaux éléments auront la classe "new", les éléments à updater auront la classe "update", supprimer les éléments exit
+  // Question 1 - Ecrire le d3 pattern permettant d'actualiser les éléments à chaque appel de la fonction update. Les nouveaux éléments auront la classe "new", les éléments à updater auront la classe "update", supprimer les éléments exit
 
-// Question 2 - Entre chaque vue, garder une consistence des lettres (i.e : ne faire rentrer que les nouvelles lettres, et modifier la position des lettres déjà existantes)
+  var bind = svg.selectAll('text').data(dataUpdate, function(d) { return d.toLowerCase(); });
+  console.log(bind);
+  
+  bind
+    .text(String)
+    .attr('class', 'update')
+    .transition()
+    .duration(1500)
+    .attr('y', 0)
+    .attr('x', function(d, i){ return i * 30; });
+
+  bind.enter().append('text')
+    .text(String)
+    .attr('class', 'new')
+    .attr('y', 100)
+    .transition()
+    .duration(1500)
+    .attr('y', 0)
+    .attr('x', function(d, i){ return i * 30; })
+    ;
+
+  bind.exit()
+    .attr('class', 'remove')
+    .transition()
+    .duration(1500)
+    .attr('y', 100)
+    .remove()
+    ;
+
+  // Question 2 - Entre chaque vue, garder une consistence des lettres (i.e : ne faire rentrer que les nouvelles lettres, et modifier la position des lettres déjà existantes)
 
 };
 
+var idx = 0;
+setInterval(function(){
+  update(idx++ % 4);
+}, 2000);
 </script>
 
 </body>

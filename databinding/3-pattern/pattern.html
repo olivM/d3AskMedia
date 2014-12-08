@@ -17,8 +17,9 @@
 
 <script type="text/javascript">
 
-var journaux1 = ["Le Monde","Le Nouvel Obs","Libération"];
+var journaux1 = ["Le Parisien","Le Nouvel Obs","Libération"];
 var journaux2 = ["Le Monde"];
+var journaux3 = ["Le Monde", "Marie Claire", "Paris Match", "Coté Sud"];
 
 d3.select("body").selectAll("p")
   .data(journaux1)
@@ -26,6 +27,13 @@ d3.select("body").selectAll("p")
 .text(String);
 
 // Question : écrire le pattern permettant d'actualiser la vue en passant du tableau journaux1 au tableau journaux2
+var bind = d3.select("body").selectAll("p")
+  .data(journaux3);
+
+bind.enter().append('p').text(String);
+bind.text(String);
+bind.exit().remove();
+
 
 </script>
 

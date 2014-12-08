@@ -3,7 +3,7 @@
 
 <head>
 
-	<script type="text/javascript" src="../src/d3.js"></script>
+	<script type="text/javascript" src="../../src/d3.js"></script>
 
 <style>
 
@@ -16,13 +16,61 @@
 
 	<script type="text/javascript">
 
+var data;
 d3.csv("../sets/lyceeFR.csv",function(csv) {
 
+	data = csv;
+
+	console.log(data);
+
 //Quelle est la moyenne du taux de réussite de tous les lycées français ?
+
+	var min = d3.min(data, function(d) { return parseFloat(d.success);});
+	var max = d3.max(data, function(d) { return parseFloat(d.success);});
+
+	console.log(min, max);
+
+	var extent = d3.extent(data, function(d) { return parseFloat(d.success);});
+
+	console.log(extent);
+
+	var mean = d3.mean(data, function(d) { return parseFloat(d.success);});
+
+	console.log(mean);
  
 //Quelle est la moyenne du taux de réussite par type de lycée (Public / Privé) ? 
 
 //Quelle est la moyenne du taux de réussite par ville ? 
+
+	var nested = d3.nest()
+		.key(function(d){ return d.ville; })
+		// .key(function(d){ return d.type; })
+		.rollup(function(city){
+			var sum = d3.sum(city, function(d){ 
+				return parseFloat(d.effectif); 
+			});
+			var bacheliers = d3.sum(city, function(d) {
+				return parseFloat(d.success) / 100 * parseFloat(d.effectif);
+			});
+			return bacheliers / sum;
+		})
+		// .sortKeys(d3.ascending)
+		.entries(data)
+		.sort(function(a, b){
+			return b.values - a.values;
+		})
+	;
+
+	console.log(nested);
+
+
+/*
+A, Paris, 5000, 60%
+B, Paris, 100, 90%
+
+(5000 * 0.6 + 100 * 0.9) / (5000 + 100)
+
+*/
 
 
 });

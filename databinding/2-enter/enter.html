@@ -21,6 +21,10 @@
 
 var journaux = ["Le Monde","Le Nouvel Obs","Libération"];
 
+var journauxSelect = d3.select('body').selectAll('p')
+	.data(journaux);
+
+journauxSelect.enter().append('p').text(String);
 
 
 </script>

@@ -28,6 +28,10 @@ text {
   fill: red;
 }
 
+.bar {
+  /*height: 50px;*/
+}
+
 
 </style>
 
@@ -63,7 +67,73 @@ var svg = d3.select("#chart").append("svg")
 var menu = d3.select("#menu select")
     .on("change", updatedata);
 
+var currentYear;
+
+function updatedata() {
+  currentYear = menu.property('value');
+
+  var data = journaux.sort(function(a, b) { 
+    return parseFloat(b[currentYear]) - parseFloat(a[currentYear])  
+  });
+
+  var bind = svg.selectAll('.journal').data(data, function(d) { return d.journal; });
+
+  var bindEnter = bind.enter()
+    .append('g')
+    .attr('class', 'journal')
+    .attr('transform', function(d, i) {
+      return "translate(0, "+ (50 + i*60) +")";
+    })
+    ;
+
+    bindEnter
+      .append('text')
+      .text(function(d) { return d.journal; });
+
+    bindEnter
+      .append('rect')
+      .attr('class', 'bar')
+      .attr('x', 300)
+      .attr('y', -40)
+      .attr('height', 50)
+      .attr('width', function(d) { return x(parseFloat(d[currentYear])); })
+      .attr('fill', function(d) { return color(d.journal); })
+    ;
+
+    bind
+      .transition()
+      .duration(1000)
+      .attr('transform', function(d, i) {
+        return "translate(0, "+ (50 + i*60) +")";
+      })
+    ;
+    bind.selectAll('.bar')
+      .transition()
+      .duration(1000)
+          .attr('width', function(d) { return x(parseFloat(d[currentYear])); })
+      ;
+
+}
+
 // Question 1 : créer la visualisation PQN française
+
+year = d3.range(1999, 2014);
+
+d3.select('#menu select').selectAll('option')
+  .data(year)
+  .enter()
+  .append('option')
+  .attr('value', String)
+  .text(String);
+
+d3.csv('data/data-journaux.csv', function(data){
+
+  journaux = data;
+
+  updatedata();
+
+});
+
 
 </script>
 
