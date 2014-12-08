@@ -66,30 +66,6 @@ var dataUpdate = data[a];
 
 // Question 2 - Entre chaque vue, garder une consistence des lettres (i.e : ne faire rentrer que les nouvelles lettres, et modifier la position des lettres déjà existantes)
 
-// Réponse
-
-// 1 - DATA JOIN (via la fonction data)
-
-textUpdate = svg.selectAll("text").data(dataUpdate, function(d) {return d});
-
-// 2 - Actualiser les anciens éléments en modifiant le texte et la classe
-
-textUpdate
-  .attr("x", function(d, i) { return i * 32; })
-  .text(function(d) {return d;}).attr("class","update");
-
-// 3 - Ajouter les éléments manquants.  (via la fonction enter()) 
-
-textUpdate.enter().append("text")
-    .attr("x", function(d, i) { return i * 32; })
-    .attr("class","new")
-    .text(function(d) {return d;});
-
-// 4 - Supprimer les éléments excédentaires (via la fonction exit())
-
-textUpdate.exit().remove();
-
-
 };
 
 </script>

@@ -64,81 +64,15 @@ d3.select("#audience button")
 
 d3.csv("../sets/sitesmedia.csv",function(csv) {
   
-  // Crossfilter
-  
-  chartData = crossfilter(csv);
-  
-  theme = chartData.dimension(function(d) {return d.theme;}),
-  audience = chartData.dimension(function(d) {return parseFloat(d.visites);});
-  
-  // Nesting and filters 
-  
-  var themeNest = d3.nest().key(function(d) {return d.theme;}).map(csv);
-    
-d3.select("#theme select").selectAll("option")
-    .data(Object.keys(themeNest))
-  .enter().append("option")
-    .text(String);
-        
-  // Update scales domains
-    
-    x.domain(Object.keys(themeNest));
-    
-    y.domain(d3.extent(csv, function(d) {return parseFloat(d.visites);}));
-    
-    updatedata();
+  // Créer la visusalisation 
   
 });
 
 function updatedata(value, selection) {
     
-  console.log(selection);
-    
-  switch (value) {
-    
-  case "audience": 
-    audience.filterRange(selection);
-  break;
-  
-  case "theme":
-    theme.filter(selection);
-  break;
-  
-  default:
-    theme.filterAll();
-    audience.filterAll();
-
-  }
-  
-  titres =  theme.top(Infinity); // convention pour pouvoir récupérer l'ensemble des éléments
- 
-  drawScatter();
-      
 }
 
 function drawScatter() {
-  
-circles = svg.selectAll(".journal").data(titres, function(d) {return d.nom;});
-  
-circlesEnter = circles.enter().append("g")
-.attr("transform", function(d,i) { return "translate("+x(d.theme)+"," + y(parseFloat(d.visites)) + ")"; })
-.attr("class","journal")
-.on("mouseover",function() {d3.select(this).select("text").attr("style","display:block;")})
-.on("mouseout",function() {d3.select(this).select("text").attr("style","display:none;")});
-
-circlesEnter.append("text")
-  .text(function(d) {return d.nom;})
-  .attr("style","display:none;")
-
-circlesEnter.append("circle")
-  .attr("r",5)
-  .attr("fill", function(d) {return color(d.theme);})
-  .attr("opacity",0.5)
-  
-circles
-.attr("transform", function(d,i) { return "translate("+x(d.theme)+"," + y(parseFloat(d.visites)) + ")"; });
-
-circles.exit().remove();
 
 
 }
