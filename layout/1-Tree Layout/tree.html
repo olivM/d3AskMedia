@@ -21,6 +21,12 @@
 	  stroke: #ccc;
 	  stroke-width: 2px;
 	}
+  .link.green {
+    stroke: #0F0;
+  }
+  .link.blue {
+    stroke: #00F;
+  }
 	
     </style>
 
@@ -49,12 +55,12 @@
     // Méthode qui prépare le set de données pour le format à visualiser
 
     var tree = d3.layout.tree()
-    	.size([height, width]);
+    	.size([height, width - 150]);
 
     // SVG Shape generator qui permet de tracer un lien à partir de l'objet {source, target} 
 
     var diagonal = d3.svg.diagonal()
-    	.projection(function(d) { return [d.y, d.x]; });
+    	.projection(function(d) { return [d.y+ (d.depth == 3 ? 100 : 0 ), d.x]; });
   
     var svg = d3.select("#chart").append("svg")
     	.attr("width", width + margin.right + margin.left)
@@ -63,13 +69,16 @@
     	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     root = groupes[0];
-  
+
     update(root);
 
     function update(source) {
 
+      console.log("update", source);
+
       var nodes = tree.nodes(root), // Calculer les positions des noeuds
     	  links = tree.links(nodes); // Calculer les positions des branches de l'arbre
+
 
       // Sélection et data binding des noeuds
       var node = svg.selectAll("g.node")
@@ -78,31 +87,68 @@
       // Enter et ajout des noeuds
       var nodeEnter = node.enter().append("g")
     	  .attr("class", "node")
+        // .on('mouseover', function(d){
+        //   d3.select(this).select('text')
+        //     .transition().duration(500)
+        //     .attr('opacity', 1);
+        // })
+        // .on('mouseout', function(d){
+        //   d3.select(this).select('text')
+        //     .transition().duration(1500)
+        //     .attr('opacity', 0);
+        // })
+        .on('click', click)
     	  .attr("transform", function(d) { 
-    		  return "translate(" + d.y + "," + d.x + ")"; });
+    		  return "translate(" + (d.y + (d.depth == 3 ? 100 : 0 ) ) + "," + d.x + ")"; })
+        ;
 
       nodeEnter.append("circle")
     	  .attr("r", 3)
     	  .style("fill", "#fff");
 
+
       nodeEnter.append("text")
+        // .attr("y", 10)
     	  .attr("x", function(d) {
-    		  return d.children || d._children ? -13 : 13; }) // Trick intéressant. Permet de positionner à droite ou à gauche en fonction de si un élément dispose ou non d'éléments children
+          // return 0;
+          // Trick intéressant. Permet de positionner à droite ou à gauche en fonction de si un élément dispose ou non d'éléments children
+    		  return d.children || d._children ? -13 : 13; 
+          }) 
     	  .attr("dy", ".35em")
+        .attr("opacity", 1)
     	  .attr("text-anchor", function(d) { 
-    		  return d.children || d._children ? "end" : "start"; })
+          // return "middle";
+    		  return d.children || d._children ? "end" : "start"; 
+        })
     	  .text(function(d) { return d.name; })
     	  .style("fill-opacity", 1);
 
+
+        var nodeExit = node.exit().remove();
+
       // Sélection et data binding des liens
       var link = svg.selectAll("path.link")
-    	  .data(links);
+        .data(links);
 
       // Append des liens
       link.enter().insert("path", "g")
-    	  .attr("class", "link")
-    	  .attr("d", diagonal );
+        .attr("class", function(d) { return "link " + ( ( d.target.part && d.target.part < 50 ) ? 'green' : 'blue' ); })
+        .attr("d", diagonal );
 
+
+    }
+
+    function click(d) {
+      console.log("click", d);
+      if ( d.children){
+        d._children = d.children;
+        d.children = null;
+      }
+      else {
+        d.children = d._children;
+        d._children = null;
+      }
+      update(d);
     }
 
 
